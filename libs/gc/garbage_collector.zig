@@ -5,6 +5,7 @@
 
 const std = @import("std");
 const print = @import("std").debug.print;
+const LOG = @import("std").log;
 
 const STACK_MAX = 256;
 const INIT_OBJ_NUM_MAX = 8;
@@ -112,7 +113,7 @@ pub const VM = struct {
                 object = &(obj.next);
             }
         }
-        //print("Done with sweep", .{})
+        LOG.debug("Done with sweep", .{});
     }
 
     // Initiate a gargabe collection cycle
@@ -126,7 +127,7 @@ pub const VM = struct {
         } else {
             self.max_objects *= 2;
         }
-        print("Collected {} objects, {} remaining.\n", .{ num_objects - self.num_objects, self.num_objects });
+        LOG.debug("Collected {} objects, {} remaining.\n", .{ num_objects - self.num_objects, self.num_objects });
     }
 
     // Internal function to create a new object
@@ -160,7 +161,7 @@ pub const VM = struct {
     // Add an object to the top of the stack
     pub fn push(self: *VM, value: *GC_OBJECT) void {
         if (self.stack_size >= STACK_MAX) {
-            print("Stack overflow!", .{});
+            LOG.debug("Stack overflow!", .{});
             unreachable;
         }
 
@@ -171,7 +172,7 @@ pub const VM = struct {
     //Remove top object from the stack
     pub fn pop(self: *VM) *GC_OBJECT {
         if (self.stack_size == 0) {
-            print("Stack underflow!", .{});
+            LOG.debug("Stack underflow!", .{});
             unreachable;
         }
 

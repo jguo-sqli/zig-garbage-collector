@@ -1,10 +1,11 @@
 const std = @import("std");
 const print = @import("std").debug.print;
+const LOG = @import("std").log;
 const VM = @import("garbage_collector.zig").VM;
 
 test "Test 1: Objects on stack are preserved" {
     const allocator = std.testing.allocator;
-    print("Objects on stack are prserved.\n", .{});
+    LOG.debug("Objects on stack are prserved.\n", .{});
 
     var _vm = try VM.init(allocator);
     var vm = &_vm;
@@ -18,7 +19,7 @@ test "Test 1: Objects on stack are preserved" {
 
 test "Test 2: Unreached objects are collected" {
     const allocator = std.testing.allocator;
-    print("Unreached objects are collected.\n", .{});
+    LOG.debug("Unreached objects are collected.\n", .{});
 
     var _vm = try VM.init(allocator);
     var vm = &_vm;
@@ -35,7 +36,7 @@ test "Test 2: Unreached objects are collected" {
 
 test "Test 3: Reach nested objects" {
     const allocator = std.testing.allocator;
-    print("Reach nested objects.\n", .{});
+    LOG.debug("Reach nested objects.\n", .{});
 
     var _vm = try VM.init(allocator);
     var vm = &_vm;
@@ -54,7 +55,7 @@ test "Test 3: Reach nested objects" {
 
 test "Test 4: Handle cycles" {
     const allocator = std.testing.allocator;
-    print("Handle cycles.\n", .{});
+    LOG.debug("Handle cycles.\n", .{});
 
     var _vm = try VM.init(allocator);
     var vm = &_vm;
@@ -76,12 +77,13 @@ test "Test 4: Handle cycles" {
 
 test "Test 5: Performance test" {
     const allocator = std.testing.allocator;
-    print("Performance Test.\n", .{});
+    LOG.debug("Performance Test.\n", .{});
     var vm = try VM.init(allocator);
     defer vm.deinit();
 
     var i: i32 = 0;
     while (i < 1000) : (i += 1) {
+        defer vm.gc();
         var j: i32 = 0;
         while (j < 20) : (j += 1) {
             try vm.pushInt(i);
@@ -91,4 +93,7 @@ test "Test 5: Performance test" {
             _ = vm.pop();
         }
     }
+
+    // try std.testing.expectEqual(0, vm.num_objects);
+    try std.testing.expect(vm.num_objects == 0);
 }
