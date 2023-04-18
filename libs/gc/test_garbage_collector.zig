@@ -77,7 +77,8 @@ test "Test 4: Handle cycles" {
 test "Test 5: Performance test" {
     const allocator = std.testing.allocator;
     print("Performance Test.\n", .{});
-    var vm = &(try VM.init(allocator));
+    var vm = try VM.init(allocator);
+    defer vm.deinit();
 
     var i: i32 = 0;
     while (i < 1000) : (i += 1) {
@@ -87,8 +88,7 @@ test "Test 5: Performance test" {
         }
         var k: i32 = 0;
         while (k < 20) : (k += 1) {
-            _ = try vm.pop();
+            _ = vm.pop();
         }
     }
-    vm.deinit();
 }
